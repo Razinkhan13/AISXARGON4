@@ -1,0 +1,110 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated user profile in AIS Capital Terminal",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "enum": ["admin", "operator", "viewer"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "PipelineLead": {
+      "title": "PipelineLead",
+      "description": "Real Estate & E-Commerce enterprise outreach lead and deal tracking",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "slug": { "type": "string", "maxLength": 64 },
+        "companyName": { "type": "string", "maxLength": 128 },
+        "category": { "type": "string", "enum": ["REAL_ESTATE", "ECOM"] },
+        "phone": { "type": "string", "maxLength": 32 },
+        "packageName": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["PROSPECT", "PITCH_SENT", "DEMO_COMPLETED", "LOCKED_WIRE", "MUSHAK_ISSUED"] },
+        "dealValueBDT": { "type": "number" },
+        "customHook": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "companyName", "category", "status"]
+    },
+    "ColdAuditRecord": {
+      "title": "ColdAuditRecord",
+      "description": "Single-site cold forensic calculation record",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "company": { "type": "string", "maxLength": 128 },
+        "katha": { "type": "number" },
+        "units": { "type": "number" },
+        "sqft": { "type": "number" },
+        "priceSqft": { "type": "number" },
+        "cancelled": { "type": "number" },
+        "stalled": { "type": "number" },
+        "odCrore": { "type": "number" },
+        "totalBleedCr": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "company", "totalBleedCr"]
+    },
+    "MushakInvoice": {
+      "title": "MushakInvoice",
+      "description": "Statutory Mushak-6.3 tax invoice and VAT settlement record",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "invoiceNo": { "type": "string", "maxLength": 64 },
+        "clientName": { "type": "string", "maxLength": 128 },
+        "packageName": { "type": "string", "maxLength": 128 },
+        "baseAmt": { "type": "number" },
+        "vatAmt": { "type": "number" },
+        "totalAmt": { "type": "number" },
+        "status": { "type": "string", "enum": ["DRAFT", "ISSUED", "SETTLED"] },
+        "settlementRef": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "invoiceNo", "clientName", "totalAmt", "status"]
+    },
+    "LockDeposit": {
+      "title": "LockDeposit",
+      "description": "Locked wire and MFS deposit proof record",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "client": { "type": "string", "maxLength": 128 },
+        "amount": { "type": "number" },
+        "channel": { "type": "string", "maxLength": 128 },
+        "ref": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["PENDING_CLEARANCE", "VERIFIED", "RECONCILED"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "client", "amount", "channel", "ref"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profile collection storing role and metadata"
+    },
+    "/leads/{leadId}": {
+      "schema": { "$ref": "#/entities/PipelineLead" },
+      "description": "Target client pipeline deals and outreach records"
+    },
+    "/audits/{auditId}": {
+      "schema": { "$ref": "#/entities/ColdAuditRecord" },
+      "description": "Persisted forensic bleed calculations and audits"
+    },
+    "/invoices/{invoiceId}": {
+      "schema": { "$ref": "#/entities/MushakInvoice" },
+      "description": "Statutory Mushak-6.3 VAT tax invoices"
+    },
+    "/deposits/{depositId}": {
+      "schema": { "$ref": "#/entities/LockDeposit" },
+      "description": "Locked wire and MFS advance retainers"
+    }
+  }
+}

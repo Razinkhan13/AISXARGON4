@@ -1,0 +1,139 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global Safety Net - Default Deny Catch-All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (request.auth.token.email == 'mustangbro009@gmail.com' && request.auth.token.email_verified == true)
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Admins Collection
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // User Profiles
+    function isValidUserProfile(data) {
+      return data.uid is string && data.uid == request.auth.uid &&
+             data.email is string && data.email.size() <= 256 &&
+             data.role in ['admin', 'operator', 'viewer'];
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isOwner(userId) && isValidUserProfile(incoming()) && incoming().role != 'admin';
+      allow update: if (isOwner(userId) || isAdmin()) && isValidUserProfile(incoming()) &&
+                    incoming().uid == existing().uid &&
+                    (isAdmin() || incoming().role == existing().role);
+      allow delete: if isAdmin();
+    }
+
+    // Pipeline Leads
+    function isValidLead(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.companyName is string && data.companyName.size() > 0 && data.companyName.size() <= 128 &&
+             data.category in ['REAL_ESTATE', 'ECOM'] &&
+             data.status in ['PROSPECT', 'PITCH_SENT', 'DEMO_COMPLETED', 'LOCKED_WIRE', 'MUSHAK_ISSUED'];
+    }
+
+    match /leads/{leadId} {
+      allow get: if isValidId(leadId) && (isOwner(existing().userId) || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isValidId(leadId) && isSignedIn() && isValidLead(incoming());
+      allow update: if isValidId(leadId) && (isOwner(existing().userId) || isAdmin()) &&
+                    isValidLead(incoming()) &&
+                    incoming().userId == existing().userId;
+      allow delete: if isValidId(leadId) && (isOwner(existing().userId) || isAdmin());
+    }
+
+    // Forensic Cold Audits
+    function isValidAudit(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.company is string && data.company.size() > 0 && data.company.size() <= 128 &&
+             data.totalBleedCr is number;
+    }
+
+    match /audits/{auditId} {
+      allow get: if isValidId(auditId) && (isOwner(existing().userId) || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isValidId(auditId) && isSignedIn() && isValidAudit(incoming());
+      allow update: if isValidId(auditId) && (isOwner(existing().userId) || isAdmin()) &&
+                    isValidAudit(incoming()) &&
+                    incoming().userId == existing().userId;
+      allow delete: if isValidId(auditId) && (isOwner(existing().userId) || isAdmin());
+    }
+
+    // Statutory Mushak-6.3 Invoices
+    function isValidInvoice(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.invoiceNo is string && data.invoiceNo.size() > 0 && data.invoiceNo.size() <= 64 &&
+             data.clientName is string && data.clientName.size() > 0 && data.clientName.size() <= 128 &&
+             data.totalAmt is number && data.totalAmt >= 0 &&
+             data.status in ['DRAFT', 'ISSUED', 'SETTLED'];
+    }
+
+    match /invoices/{invoiceId} {
+      allow get: if isValidId(invoiceId) && (isOwner(existing().userId) || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isValidId(invoiceId) && isSignedIn() && isValidInvoice(incoming());
+      allow update: if isValidId(invoiceId) && (isOwner(existing().userId) || isAdmin()) &&
+                    isValidInvoice(incoming()) &&
+                    incoming().userId == existing().userId;
+      allow delete: if isValidId(invoiceId) && (isOwner(existing().userId) || isAdmin());
+    }
+
+    // Locked Wire & MFS Advance Deposits
+    function isValidDeposit(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.client is string && data.client.size() > 0 && data.client.size() <= 128 &&
+             data.amount is number && data.amount > 0 &&
+             data.channel is string && data.channel.size() > 0 && data.channel.size() <= 128 &&
+             data.ref is string && data.ref.size() > 0 && data.ref.size() <= 128;
+    }
+
+    match /deposits/{depositId} {
+      allow get: if isValidId(depositId) && (isOwner(existing().userId) || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isValidId(depositId) && isSignedIn() && isValidDeposit(incoming());
+      allow update: if isValidId(depositId) && (isOwner(existing().userId) || isAdmin()) &&
+                    isValidDeposit(incoming()) &&
+                    incoming().userId == existing().userId;
+      allow delete: if isValidId(depositId) && (isOwner(existing().userId) || isAdmin());
+    }
+
+    // Connection Health Check
+    match /test/connection {
+      allow get: if true;
+    }
+  }
+}

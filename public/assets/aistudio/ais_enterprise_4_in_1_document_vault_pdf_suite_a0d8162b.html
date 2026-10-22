@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIS Enterprise Systems — 4-in-1 Corporate Document Vault & PDF Generator</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- html2pdf.js for Direct 1-Click PDF File Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ais-navy: #0F1722;
+      --ais-cyan: #38BDF8;
+    }
+    body {
+      background-color: #080C12;
+      color: #0F1722;
+      font-family: 'DM Sans', 'Noto Sans Bengali', sans-serif;
+    }
+    .font-syne { font-family: 'Syne', sans-serif; }
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+    .font-bangla { font-family: 'Noto Sans Bengali', 'DM Sans', sans-serif; }
+
+    /* A4 Printable Sheet */
+    .a4-page {
+      width: 210mm;
+      min-height: 296mm;
+      padding: 12mm 14mm;
+      margin: 0 auto 2rem auto;
+      background: #FFFFFF;
+      color: #0F1722;
+      box-sizing: border-box;
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
+    }
+
+    /* Live Edit Hover Indicator */
+    [contenteditable="true"]:hover {
+      outline: 1px dashed #0284C7;
+      background-color: rgba(56, 189, 248, 0.08);
+      cursor: text;
+    }
+    [contenteditable="true"]:focus {
+      outline: 2px solid #0F1722;
+      background-color: #F0F9FF;
+    }
+
+    @media print {
+      @page { size: A4 portrait; margin: 0mm; }
+      body {
+        background: #FFFFFF !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .no-print { display: none !important; }
+      .a4-page {
+        width: 210mm !important;
+        height: 297mm !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        page-break-after: always;
+        break-after: page;
+      }
+      .a4-page:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+    }
+  </style>
+</head>
+<body class="pb-16">
+
+  <!-- ===================================================================== -->
+  <!-- REUSABLE VECTOR REPLICA OF YOUR AIS SHIELD & COMPASS LOGO             -->
+  <!-- ===================================================================== -->
+  <svg class="hidden" aria-hidden="true">
+    <symbol id="ais-official-logo" viewBox="0 0 240 240">
+      <circle cx="120" cy="120" r="116" fill="#0F1722" stroke="#38BDF8" stroke-width="4"/>
+      <path d="M120 42 L176 58 L176 112 C176 148 148 172 120 188 C92 172 64 148 64 112 L64 58 Z"
+            fill="none" stroke="#38BDF8" stroke-width="5.5" stroke-linejoin="round"/>
+      <circle cx="120" cy="108" r="28" fill="none" stroke="#38BDF8" stroke-width="2.2" stroke-opacity="0.85"/>
+      <polygon points="120,58 125,108 120,145 115,108" fill="#38BDF8"/>
+      <polygon points="82,108 120,104 158,108 120,112" fill="#38BDF8" fill-opacity="0.85"/>
+      <circle cx="120" cy="53" r="3" fill="none" stroke="#38BDF8" stroke-width="2"/>
+      <text x="120" y="152" text-anchor="middle" fill="#38BDF8" font-family="'Syne', 'Arial Black', sans-serif" font-weight="900" font-size="68" letter-spacing="-2">AIS</text>
+      <rect x="68" y="118" width="22" height="3.5" fill="#0F1722"/>
+      <rect x="112" y="132" width="18" height="3.5" fill="#0F1722"/>
+      <rect x="150" y="102" width="24" height="3.5" fill="#0F1722"/>
+      <text x="120" y="208" text-anchor="middle" fill="#F8FAFC" font-family="'DM Sans', sans-serif" font-weight="600" font-size="11.5" letter-spacing="1.8">ARMY IBA SPECIALIST</text>
+    </symbol>
+  </svg>
+
+  <!-- ===================================================================== -->
+  <!-- STICKY EXECUTIVE CONTROL BAR (SWITCH OR DOWNLOAD INDIVIDUAL DOCS)     -->
+  <!-- ===================================================================== -->
+  <header class="no-print sticky top-0 z-50 bg-[#0F1722]/95 backdrop-blur-md border-b-2 border-[#38BDF8] px-4 py-3 text-white shadow-2xl mb-8">
+    <div class="max-w-[210mm] mx-auto flex flex-col gap-3">
+      <div class="flex flex-wrap justify-between items-center gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full overflow-hidden border border-[#38BDF8] bg-[#080C12] flex items-center justify-center shrink-0">
+            <img src="ais-logo.jpg" alt="AIS" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <svg class="w-10 h-10 hidden"><use href="#ais-official-logo"></use></svg>
+          </div>
+          <div>
+            <span class="font-syne text-sm font-extrabold uppercase tracking-wider text-white">AIS ENTERPRISE 4-DOCUMENT HTML &amp; PDF VAULT</span>
+            <p class="text-[11px] text-slate-300">Click any text on the white A4 sheets below to edit. Switch documents or export directly to PDF.</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="downloadActivePDF()" id="btn-dl-pdf" class="px-4 py-2 bg-[#38BDF8] hover:bg-sky-300 text-[#080C12] font-mono-code text-xs font-bold uppercase cursor-pointer transition shadow-lg">
+            ⬇ Download Active .PDF
+          </button>
+          <button onclick="window.print()" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-[#080C12] font-mono-code text-xs font-bold uppercase cursor-pointer transition">
+            🖨 Print / Save A4 PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Document Selector Tabs -->
+      <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-800">
+        <button id="tab-doc1" onclick="showDoc('doc1')" class="px-3 py-1.5 font-mono-code text-[11px] font-bold uppercase bg-[#38BDF8] text-[#080C12] transition">
+          Doc 1: Operating Manual &amp; Cheat Sheet
+        </button>
+        <button id="tab-doc2" onclick="showDoc('doc2')" class="px-3 py-1.5 font-mono-code text-[11px] font-bold uppercase bg-slate-900 text-slate-300 border border-slate-700 hover:border-[#38BDF8] transition">
+          Doc 2: Tier-1 Real Estate Dossier (10)
+        </button>
+        <button id="tab-doc3" onclick="showDoc('doc3')" class="px-3 py-1.5 font-mono-code text-[11px] font-bold uppercase bg-slate-900 text-slate-300 border border-slate-700 hover:border-[#38BDF8] transition">
+          Doc 3: 1-Page Client Proposal &amp; MSA
+        </button>
+        <button id="tab-doc4" onclick="showDoc('doc4')" class="px-3 py-1.5 font-mono-code text-[11px] font-bold uppercase bg-slate-900 text-slate-300 border border-slate-700 hover:border-[#38BDF8] transition">
+          Doc 4: Official NBR Mushak-6.3 Invoice
+        </button>
+        <button id="tab-all" onclick="showDoc('all')" class="px-3 py-1.5 font-mono-code text-[11px] font-bold uppercase bg-slate-800 text-amber-300 border border-amber-500/40 hover:bg-slate-700 transition ml-auto">
+          View All 4 Sheets Together
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- WRAPPER FOR PDF EXPORT                                                -->
+  <!-- ===================================================================== -->
+  <main id="vault-export-container">
+
+    <!-- =================================================================== -->
+    <!-- DOCUMENT 1: AIS MASTER OPERATING MANUAL, PRD, TRD & CHEAT SHEET     -->
+    <!-- =================================================================== -->
+    <section id="sheet-doc1" class="a4-page flex flex-col justify-between">
+      <div>
+        <!-- Header -->
+        <div class="bg-[#0F1722] text-white p-5 border-b-4 border-[#38BDF8] flex justify-between items-center">
+          <div class="flex items-center gap-3.5">
+            <div class="w-14 h-14 rounded-full overflow-hidden border-2 border-[#38BDF8] bg-[#080C12] flex items-center justify-center shrink-0">
+              <img src="ais-logo.jpg" alt="AIS" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+              <svg class="w-14 h-14 hidden"><use href="#ais-official-logo"></use></svg>
+            </div>
+            <div>
+              <span class="px-2 py-0.5 bg-[#38BDF8] text-[#080C12] font-mono-code text-[9px] font-bold uppercase">DOCUMENT 01 // INTERNAL PLAYBOOK</span>
+              <h1 class="font-syne text-xl font-extrabold tracking-tight mt-1 text-white">AIS ENTERPRISE SYSTEMS (ARMY IBA SPECIALIST)</h1>
+              <p class="text-[11px] text-slate-300">Master Operating Manual, PRD, TRD &amp; Daily Operator Cheat Sheet</p>
+            </div>
+          </div>
+          <div class="text-right font-mono-code text-[11px]">
+            <div class="text-[#38BDF8] font-bold">FOUNDER SIGNATORY</div>
+            <div class="text-white">Rizum Khan</div>
+            <div class="text-slate-400">Oct 17, 2026</div>
+          </div>
+        </div>
+
+        <!-- 1. Corporate Identity & Verified Settlement Lock -->
+        <div class="mt-4">
+          <h2 class="font-syne text-xs font-extrabold uppercase text-[#0F1722] border-b-2 border-[#0F1722] pb-1 mb-2">
+            01 // OFFICIAL CORPORATE IDENTITY &amp; SETTLEMENT LOCK (BANGLADESH)
+          </h2>
+          <table class="w-full text-xs border-collapse border border-slate-300">
+            <tbody class="divide-y divide-slate-300">
+              <tr class="bg-slate-50">
+                <td class="p-2 font-bold w-1/3 border-r border-slate-300">Legal Brand Identity</td>
+                <td class="p-2" contenteditable="true">AIS Enterprise Systems (Army IBA Specialist)</td>
+              </tr>
+              <tr>
+                <td class="p-2 font-bold border-r border-slate-300">Registered Office Address</td>
+                <td class="p-2" contenteditable="true">15 Mayakanon, Basaboo, Khilgaon, Dhaka-1214, Bangladesh</td>
+              </tr>
+              <tr class="bg-sky-50/70">
+                <td class="p-2 font-bold border-r border-slate-300">Primary Corporate Bank Account</td>
+                <td class="p-2 font-mono-code font-bold text-[#0F1722]" contenteditable="true">Trust Bank PLC — Jalalabad Cantonment Branch | A/C: 00110466000494</td>
+              </tr>
+              <tr>
+                <td class="p-2 font-bold border-r border-slate-300">Official Mobile Financial Services</td>
+                <td class="p-2 font-mono-code font-bold" contenteditable="true">bKash: 01715219176 &nbsp;|&nbsp; Nagad: 01708761298</td>
+              </tr>
+              <tr class="bg-slate-50">
+                <td class="p-2 font-bold border-r border-slate-300">NBR VAT Service Code &amp; Gate</td>
+                <td class="p-2" contenteditable="true">S099.10 (IT Enabled Services &amp; ERP) | Final Signatory: Rizum Khan</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 2. Product & Technical Requirements (80/20 Architecture) -->
+        <div class="mt-4">
+          <h2 class="font-syne text-xs font-extrabold uppercase text-[#0F1722] border-b-2 border-[#0F1722] pb-1 mb-2">
+            02 // PRODUCT &amp; TECHNICAL ARCHITECTURE (THE 80/20 COMPOSABLE ENGINE)
+          </h2>
+          <div class="grid grid-cols-2 gap-3 text-[11px]">
+            <div class="border border-slate-300 bg-slate-50 p-2.5">
+              <div class="font-mono-code text-[10px] font-bold text-[#0F1722] uppercase">80% IMMUTABLE CORE KERNEL</div>
+              <p class="mt-1 text-slate-700 leading-relaxed" contenteditable="true">
+                Shared multi-tenant PostgreSQL 16 database (<code>tenants</code>, <code>core_entities</code>, <code>operational_transactions</code>, <code>tenant_scenarios</code>) using indexed <code>JSONB</code> custom attributes and Offline-First React/Tailwind PWA caching.
+              </p>
+            </div>
+            <div class="border border-slate-300 bg-slate-50 p-2.5">
+              <div class="font-mono-code text-[10px] font-bold text-sky-800 uppercase">20% DYNAMIC SCENARIO LAYER</div>
+              <p class="mt-1 text-slate-700 leading-relaxed" contenteditable="true">
+                Self-hosted <strong>n8n Queue Mode (Redis)</strong> + <strong>Google Gemini 2.5 Structured Outputs</strong> to qualify Bangla/Banglish leads, filter fake COD orders, and trigger Steadfast/Pathao/WhatsApp webhooks.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Master 5-Tab Portal Daily Cheat Sheet -->
+        <div class="mt-4">
+          <h2 class="font-syne text-xs font-extrabold uppercase text-[#0F1722] border-b-2 border-[#0F1722] pb-1 mb-2">
+            03 // MASTER 5-TAB PORTAL CHEAT SHEET (DAILY 15-MINUTE ROUTINE)
+          </h2>
+          <table class="w-full text-[11px] border-collapse border border-slate-300">
+            <thead>
+              <tr class="bg-[#0F1722] text-white font-mono-code text-[10px] uppercase">
+                <th class="p-2 border border-slate-600 text-left">Portal Tab</th>
+                <th class="p-2 border border-slate-600 text-left">When to Use</th>
+                <th class="p-2 border border-slate-600 text-left">Your Exact 30-Second Operator Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-300">
+              <tr>
+                <td class="p-2 font-bold">Tab 1: Lead Radar</td>
+                <td class="p-2">Morning Outreach</td>
+                <td class="p-2" contenteditable="true">Select a researched Tier-1 developer or E-Com brand, toggle Boardroom EN or Banglish, and click <strong>Send Cold Audit Hook</strong> via WhatsApp.</td>
+              </tr>
+              <tr class="bg-slate-50">
+                <td class="p-2 font-bold">Tab 2: Liquidity Mirror</td>
+                <td class="p-2">Min 1–5 of Meeting</td>
+                <td class="p-2" contenteditable="true">Input client's stalled site SqFt &amp; cancelled units. Show how REDMA Sec 14 (90% refund) + Sec 15 (15% delay interest) + 14% OD bleeds <strong>BDT 1.24 Cr/yr</strong>.</td>
+              </tr>
+              <tr>
+                <td class="p-2 font-bold">Tab 3: Sandbox Desk</td>
+                <td class="p-2">Min 6–12 of Meeting</td>
+                <td class="p-2" contenteditable="true">Pitch the 30-day <strong>Single-Asset Sandbox</strong> (1 stalled site). Use the <em>Zamindar Fallacy</em> and <em>Cyclical Denial</em> battlecards to crush objections.</td>
+              </tr>
+              <tr class="bg-slate-50">
+                <td class="p-2 font-bold">Tab 4: Executive Lock</td>
+                <td class="p-2">Min 15 (Closing)</td>
+                <td class="p-2" contenteditable="true">Show Trust Bank (<code>00110466000494</code>) / bKash (<code>01715219176</code>) card. Once 50% token arrives, click <strong>Approve &amp; Lock Funds</strong>.</td>
+              </tr>
+              <tr>
+                <td class="p-2 font-bold">Tab 5: PDF Drawer</td>
+                <td class="p-2">Contract Handover</td>
+                <td class="p-2" contenteditable="true">Click <strong>Download .PDF File</strong> to export the 2-Page Mandate &amp; Statutory NBR Mushak-6.3 Invoice.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 4. Master Gemini Prompts -->
+        <div class="mt-4">
+          <h2 class="font-syne text-xs font-extrabold uppercase text-[#0F1722] border-b-2 border-[#0F1722] pb-1 mb-2">
+            04 // MASTER COPY-PASTE GEMINI PROMPTS FOR RAPID EXECUTION
+          </h2>
+          <div class="space-y-2 text-[10.5px] bg-slate-50 border border-slate-300 p-3">
+            <p contenteditable="true"><strong>Prompt 1 (New Company Audit):</strong> <em>"Act as Chief Turnaround Architect for AIS Enterprise Systems. Diagnose [Company Name] in Dhaka across REDMA Sec 14/15, DAP FAR cuts, or Fake COD Returns. Output their Promoter Bias, a 3-point Single-Asset Sandbox solution, and a 75-word Banglish WhatsApp hook."</em></p>
+            <p contenteditable="true"><strong>Prompt 2 (Forensic Site Audit):</strong> <em>"Calculate the exact REDMA Sec 14 90-day refund liability, Sec 15 15% annual delay penalty, and 14% Bank OD drag for a [X]-Katha, [Y]-SqFt project in [Location] with [Z] cancelled units, and output a 90-day recovery plan."</em></p>
+            <p contenteditable="true"><strong>Prompt 3 (Post-Payment Provisioning):</strong> <em>"Client [Name] deposited their 50% mobilization token into Trust Bank A/C 00110466000494. Generate their PostgreSQL JSONB tenant insert script and n8n webhook workflow JSON."</em></p>
+          </div>
+        </div>
+      </div>
+
+      <footer class="border-t-2 border-[#0F1722] pt-2 text-[10px] flex justify-between text-slate-600">
+        <span>AIS Enterprise Systems (Army IBA Specialist) — 15 Mayakanon, Basaboo, Khilgaon, Dhaka-1214</span>
+        <span class="font-mono-code font-bold text-[#0F1722]">DOCUMENT 01 // MASTER OPERATING MANUAL</span>
+      </footer>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- DOCUMENT 2: TIER-1 REAL ESTATE TURNAROUND DOSSIER (10 COMPANIES)    -->
+    <!-- =================================================================== -->
+    <section id="sheet-doc2" class="a4-page hidden flex flex-col justify-between">
+      <div>
+        <div class="bg-[#0F1722] text-white p-4 border-b-4 border-[#38BDF8] flex justify-between items-center">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-[#38BDF8] bg-[#080C12] flex items-center justify-center shrink-0">
+              <img src="ais-logo.jpg" alt="AIS" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+              <svg class="w-12 h-12 hidden"><use href="#ais-official-logo"></use></svg>
+            </div>
+            <div>
+              <span class="px-2 py-0.5 bg-[#38BDF8] text-[#080C12] font-mono-code text-[9px] font-bold uppercase">DOCUMENT 02 // INSTITUTIONAL RESEARCH DOSSIER</span>
+              <h1 class="font-syne text-lg font-extrabold tracking-tight mt-0.5 text-white">TIER-1 REAL ESTATE TURNAROUND DOSSIER (BANGLADESH)</h1>
+              <p class="text-[10.5px] text-slate-300">8-Katha Empirical Stalled-Site Model &amp; Custom Sandbox Solutions for 10 Market Leaders</p>
+            </div>
+          </div>
+          <div class="text-right font-mono-code text-[10px]">
+            <div class="text-[#38BDF8] font-bold">AIS RESEARCH DESK</div>
+            <div class="text-white">Dhaka-1214</div>
+          </div>
+        </div>
+
+        <!-- Empirical 8-Katha Model Summary Box -->
+        <div class="my-3 bg-red-50 border-l-4 border-red-600 p-2.5 text-[10.5px]">
+          <div class="font-mono-code font-bold text-red-800 uppercase">01 // EMPIRICAL 8-KATHA STALLED-SITE MODEL (THE LIQUIDITY MIRROR)</div>
+          <p class="text-slate-800 mt-0.5" contenteditable="true">
+            <strong>Baseline:</strong> 8-Katha, 10-Story, 32,000 SqFt (16 units × 2,000 SqFt), 50:50 JVA (8 Dev units @ BDT 11,000/SqFt = BDT 17.60 Cr). At 6th floor (55% build + BDT 2Cr signing = <strong>BDT 8.688 Cr deployed</strong>; 5 units pre-sold @ 50% = BDT 5.50 Cr inflow; <strong>BDT 3.188 Cr Bank OD @ 14%</strong>).<br>
+            <strong>The Shock:</strong> 2 cancelled units trigger <strong>BDT 1.98 Cr cash refund in 90 days (REDMA Sec 14)</strong>. Annual stalled bleed = <strong>BDT 49.50L (Sec 15 15% delay penalty)</strong> + <strong>BDT 44.63L (14% OD interest)</strong> + <strong>BDT 12L (Displacement rent)</strong> + <strong>BDT 18L (Site decay)</strong> = <strong class="text-red-700">BDT 1.2413 Crore/year per site</strong> (BDT 25–40 Cr/yr across 20–30 sites).
+          </p>
+        </div>
+
+        <!-- 10 Tier-1 Developers Table -->
+        <h2 class="font-syne text-xs font-extrabold uppercase text-[#0F1722] border-b-2 border-[#0F1722] pb-1 mb-1.5">
+          02 // CUSTOM SINGLE-ASSET SANDBOX BLUEPRINTS FOR 10 TIER-1 DEVELOPERS
+        </h2>
+        <table class="w-full text-[10px] border-collapse border border-slate-300">
+          <thead>
+            <tr class="bg-[#0F1722] text-white font-mono-code text-[9.5px] uppercase">
+              <th class="p-1.5 border border-slate-600 text-left w-[22%]">Tier-1 Developer</th>
+              <th class="p-1.5 border border-slate-600 text-left w-[36%]">Diagnosed Liquidity Vulnerability</th>
+              <th class="p-1.5 border border-slate-600 text-left w-[42%]">Custom AIS Single-Asset Sandbox Solution</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-300">
+            <tr>
+              <td class="p-1.5 font-bold">1. Sheltech (Pvt.) Ltd.<br><span class="font-normal text-[9px] text-slate-500">1988 | 170+ Projects</span></td>
+              <td class="p-1.5" contenteditable="true">Cited for <strong>25% booking cancellations</strong>; REDMA Sec 14 (90% refund in 90d) drains active site cash while Sec 15 adds 15% delay interest.</td>
+              <td class="p-1.5" contenteditable="true">Ring-fence 1 condominium in Trust Bank Escrow; subdivide cancelled &gt;2,000 sqft flats into <strong>800–1,200 sqft units</strong> (≥82% efficiency); 18-mo build.</td>
+            </tr>
+            <tr class="bg-slate-50">
+              <td class="p-1.5 font-bold">2. Concord Real Estate<br><span class="font-normal text-[9px] text-slate-500">1973 | 1,200+ Projects</span></td>
+              <td class="p-1.5" contenteditable="true">Capital trapped in large towers due to 20–40% DAP FAR cuts and 25–30% rebar/cement surge despite AA+ rating.</td>
+              <td class="p-1.5" contenteditable="true">Pair Concord's ready-mix/precast plants with <strong>aluminum formwork</strong> (slab cycle 25d → 8d); spin off Grade-A commercial floors into a <strong>Private REIT SPV</strong>.</td>
+            </tr>
+            <tr>
+              <td class="p-1.5 font-bold">3. bti<br><span class="font-normal text-[9px] text-slate-500">1984 | 400+ Projects</span></td>
+              <td class="p-1.5" contenteditable="true">Velocity fell from 5–8 to 1–2 units/mo; holding unsold &gt;2,200 sqft units costs <strong>BDT 1,800–3,200/sqft/yr</strong>.</td>
+              <td class="p-1.5" contenteditable="true">Bulk-liquidate 12–15 stagnant luxury units at 12–18% corporate discount to unlock <strong>BDT 25–40 Cr cash</strong>; connect ISO CRM to <strong>NRB NRTA 75% mortgages</strong>.</td>
+            </tr>
+            <tr class="bg-slate-50">
+              <td class="p-1.5 font-bold">4. Dom-Inno Developers<br><span class="font-normal text-[9px] text-slate-500">2002 | 253+ Projects</span></td>
+              <td class="p-1.5" contenteditable="true">Prime Dhanmondi/Uttara/Gulshan boutique sites squeezed by BDT 2Cr+ signing outlays &amp; BDT 1–2L/mo displacement rent.</td>
+              <td class="p-1.5" contenteditable="true">Deploy the <strong>8-Katha Empirical Sandbox</strong> on 1 boutique JVA site; use light-gauge steel partitions to cut build time 45% &amp; save 38% displacement rent.</td>
+            </tr>
+            <tr>
+              <td class="p-1.5 font-bold">5. SEL<br><span class="font-normal text-[9px] text-slate-500">1983 | 236+ Projects</span></td>
+              <td class="p-1.5" contenteditable="true">2021–2023 fixed-price pre-sales eroded by rebar hitting Tk 108k/MT and cement hitting Tk 580/bag (+25–30% surge).</td>
+              <td class="p-1.5" contenteditable="true">Execute factory-gate indexed supply contracts with BSRM/GPH &amp; Crown (saving 8–12%) + deploy <strong>Phase IV Digital Escrow ERP</strong> (&lt;2% material waste).</td>
+            </tr>
+            <tr class="bg-slate-50">
+              <td class="p-1.5 font-bold">6. Navana Real Estate<br><span class="font-normal text-[9px] text-slate-500">1996 | 250+ Projects</span></td>
+              <td class="p-1.5" contenteditable="true">Centralized treasury pooling across Dhaka &amp; Chattogram exposes healthy sites to stalled towers while OD compounds at 12–17%.</td>
+              <td class="p-1.5" contenteditable="true">Quarantine 100% of active condominium clusters into standalone Project Escrows; liquidate slow peripheral stock to retire <strong>40% of OD debt</strong> in Year 1.</td>
+            </tr>
+            <tr>
+              <td class="p-1.5 font-bold">7. Rupayan Housing<br><span class="font-normal text-[9px] text-slate-500">1998 | 144+ Projects</span></td>
+              <td class="p-1.5" contenteditable="true">High exposure to <em>The Zamindar Fallacy</em>—holding mega-township large inventory at headline prices under 14–17% debt drag.</td>
+              <td class="p-1.5" contenteditable="true">Package 15 stagnant township units for institutional bulk sale at 15% discount to release <strong>BDT 35 Cr immediately</strong> + launch <strong>NRB NRTA Township Desk</strong>.</td>
+            </tr>
+            <tr class="bg-slate-50">
+              <td class="p-1.5 font-bold">8. Eastern Housing Ltd.<br><span class="font-normal text-[9px] text-slate-500">1964 | 100+ Complexes</span></td>
+              <td class="p-1.5" contenteditable="true">Sole DSE-listed developer; national deed registration drop (-42.73%) and Occupancy Certificate delays suppress ROE.</td>
+              <td class="p-1.5" contenteditable="true">Deploy automated <strong>BNBC/RAJUK compliance ERP</strong> to cut Occupancy Certificate time by 60%, accelerate Saf Kabala deeds, and target <strong>≥24% ROE REIT</strong>.</td>
+            </tr>
+            <tr>
+              <td class="p-1.5 font-bold">9. Anwar Landmark<br><span class="font-normal text-[9px] text-slate-500">2001 | 50+ Projects</span></td>
+              <td class="p-1.5" contenteditable="true">Hit by Dhaka's 1,450+ JVA terminations triggered by the <strong>15% NBR tax</strong> on landowner mouza value and cash signing money.</td>
+              <td class="p-1.5" contenteditable="true">Replace taxed cash signing money with <strong>ring-fenced SPV equity</strong> and integrate internal Anwar Group building materials into Digital Escrow ERP (&lt;2% waste).</td>
+            </tr>
+            <tr class="bg-slate-50">
+              <td class="p-1.5 font-bold">10. Shanta Holdings<br><span class="font-normal text-[9px] text-slate-500">2005 | 40+ Projects</span></td>
+              <td class="p-1.5" contenteditable="true">Ultra-luxury (&gt;2,500 sqft) demand contraction after withdrawal of undisclosed income tax concessions and HNW caution.</td>
+              <td class="p-1.5" contenteditable="true">Transition ultra-luxury exposure into <strong>Foreign Currency (FC) / NRTA Repatriation Suites</strong> for global diaspora &amp; structure Grade-A towers into <strong>Private REITs</strong>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <footer class="border-t-2 border-[#0F1722] pt-2 text-[10px] flex justify-between text-slate-600">
+        <span>AIS Enterprise Systems (Army IBA Specialist) — 15 Mayakanon, Basaboo, Khilgaon, Dhaka-1214</span>
+        <span class="font-mono-code font-bold text-[#0F1722]">DOCUMENT 02 // TIER-1 TURNAROUND DOSSIER</span>
+      </footer>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- DOCUMENT 3: 1-PAGE CLIENT PROPOSAL & MASTER SERVICE AGREEMENT       -->
+    <!-- =================================================================== -->
+    <section id="sheet-doc3" class="a4-page hidden flex flex-col justify-between">
+      <div>
+        <header class="bg-[#0F1722] text-white p-5 border-b-4 border-[#38BDF8] flex justify-between items-center">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-[#38BDF8] bg-[#080C12] flex items-center justify-center shrink-0">
+              <img src="ais-logo.jpg" alt="AIS Logo" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+              <svg class="w-16 h-16 hidden"><use href="#ais-official-logo"></use></svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 bg-[#38BDF8] text-[#080C12] font-mono-code text-[10px] font-bold uppercase">ARMY IBA SPECIALIST (AIS)</span>
+                <span class="font-mono-code text-[11px] text-sky-300" contenteditable="true">REF: AIS-TRN-2026-101</span>
+              </div>
+              <h1 class="font-syne text-2xl font-extrabold tracking-tight mt-1 text-white">AIS ENTERPRISE SYSTEMS</h1>
+              <p class="text-[11px] text-slate-300">15 Mayakanon, Basaboo, Khilgaon, Dhaka-1214, Bangladesh</p>
+            </div>
+          </div>
+          <div class="text-right font-mono-code text-xs">
+            <div class="text-slate-400">MANDATE DATE</div>
+            <div class="text-white font-bold" contenteditable="true">17 OCTOBER 2026</div>
+            <div class="text-[#38BDF8] mt-1">TRANSPARENCY GUARANTEED</div>
+          </div>
+        </header>
+
+        <div class="grid grid-cols-2 gap-4 bg-slate-100 border border-slate-300 p-3.5 my-4 text-xs">
+          <div>
+            <div class="font-mono-code text-[10px] text-slate-500 uppercase">PREPARED EXCLUSIVELY FOR (CLIENT)</div>
+            <div class="font-bold text-sm text-[#0F1722] mt-0.5" contenteditable="true">Sheltech (Pvt.) Ltd.</div>
+            <div class="text-slate-700" contenteditable="true">55 West Panthapath, Dhaka-1205, Bangladesh</div>
+            <div class="font-mono-code text-[11px] text-slate-800 mt-1" contenteditable="true">Client BIN: 001928374-0101</div>
+          </div>
+          <div class="border-l border-slate-300 pl-4">
+            <div class="font-mono-code text-[10px] text-slate-500 uppercase">SINGLE-ASSET SANDBOX MANDATE</div>
+            <div class="font-bold text-sm text-[#0F1722] mt-0.5" contenteditable="true">Project Escrow, REDMA Shield &amp; Digital ERP</div>
+            <div class="text-slate-700" contenteditable="true">Designated Site: 8-Katha Condominium (32,000 SqFt)</div>
+            <div class="font-mono-code text-[11px] text-sky-700 font-bold mt-1">14 Working Days to Escrow Go-Live</div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <h2 class="font-syne text-xs font-extrabold uppercase text-[#0F1722] border-b-2 border-[#0F1722] pb-1 mb-2.5">
+            01 // FORENSIC COLD AUDIT vs. AIS SINGLE-ASSET SANDBOX INTERVENTION
+          </h2>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="border border-red-200 bg-red-50/60 p-3">
+              <div class="font-mono-code text-[10px] font-bold text-red-700 uppercase">CURRENT BALANCE SHEET EXPOSURE</div>
+              <p class="text-slate-800 mt-1 leading-relaxed" contenteditable="true">
+                Across a standard 8-katha (16-unit) stalled project, a 25% booking cancellation rate triggers <strong>BDT 1.98 Crore</strong> in mandatory 90-day refunds under <strong>REDMA 2010 Section 14</strong>, while <strong>Section 15</strong> compounds at 15% annual delay interest alongside 14%–17% bank OD drag—draining <strong>BDT 1.2413 Crore annually per stalled site</strong>.
+              </p>
+            </div>
+            <div class="border border-sky-300 bg-sky-50/60 p-3">
+              <div class="font-mono-code text-[10px] font-bold text-sky-800 uppercase">THE AIS SANDBOX SOLUTION</div>
+              <p class="text-slate-800 mt-1 leading-relaxed" contenteditable="true">
+                Without disrupting your wider corporate portfolio, we isolate <strong>one designated project</strong> into a ring-fenced Trust Bank Escrow, re-engineer unsold layouts into bankable <strong>800–1,200 sq ft units</strong> (≥82% carpet ratio), deploy our <strong>NRB (NRTA/FC) 30-second WhatsApp AI Qualifier</strong>, and lock material waste below &lt;2%.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <h2 class="font-syne text-xs font-extrabold uppercase text-[#0F1722] border-b-2 border-[#0F1722] pb-1 mb-2.5">
+            02 // TRANSPARENT DELIVERABLES &amp; COMMERCIAL INVESTMENT SCHEDULE (BDT)
+          </h2>
+          <table class="w-full text-left border-collapse border border-slate-400 text-xs">
+            <thead>
+              <tr class="bg-[#0F1722] text-white font-mono-code text-[10px] uppercase">
+                <th class="p-2 border border-slate-600">Deliverable &amp; Turnaround Mechanism</th>
+                <th class="p-2 border border-slate-600">Billing Structure</th>
+                <th class="p-2 border border-slate-600 text-right">Investment (BDT)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-300">
+              <tr>
+                <td class="p-2 font-semibold text-[#0F1722]" contenteditable="true">
+                  1. Single-Asset Sandbox Setup &amp; Escrow Ring-Fencing<br>
+                  <span class="font-normal text-[10.5px] text-slate-600">PostgreSQL JSONB tenant, 800–1,200 SqFt re-engineering &amp; NRB AI Qualifier</span>
+                </td>
+                <td class="p-2 font-mono-code text-[11px]" contenteditable="true">One-Time (50% Token / 50% Handover)</td>
+                <td class="p-2 font-mono-code font-bold text-right" contenteditable="true">৳1,50,000.00</td>
+              </tr>
+              <tr class="bg-slate-50">
+                <td class="p-2 font-semibold text-[#0F1722]" contenteditable="true">
+                  2. Phase IV Digital Escrow ERP &amp; Managed Cloud Retainer<br>
+                  <span class="font-normal text-[10.5px] text-slate-600">24/7 n8n queue server, &lt;2% material waste tracker &amp; BNBC compliance</span>
+                </td>
+                <td class="p-2 font-mono-code text-[11px]" contenteditable="true">Monthly Recurring (Unlimited Users)</td>
+                <td class="p-2 font-mono-code font-bold text-right" contenteditable="true">৳35,000.00 / mo</td>
+              </tr>
+              <tr class="bg-sky-50 font-bold">
+                <td colspan="2" class="p-2 text-right font-mono-code text-[11px] uppercase text-[#0F1722]">
+                  Upfront Mobilization Due Today (50% Setup Token + Month 1 ERP Ex-VAT):
+                </td>
+                <td class="p-2 font-mono-code text-sm text-right text-sky-800" contenteditable="true">৳1,10,000.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mb-4 border-2 border-[#0F1722] bg-slate-50 p-3 text-xs">
+          <div class="font-mono-code text-[10px] font-bold uppercase text-[#0F1722] mb-1.5">
+            03 // OFFICIAL AIS SETTLEMENT CHANNELS (TRUST BANK / bKASH / NAGAD)
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p><strong>Bank Name:</strong> Trust Bank PLC</p>
+              <p><strong>Branch:</strong> Jalalabad Cantonment Branch</p>
+              <p><strong>Account Number:</strong> <span class="font-mono-code font-bold bg-white px-1.5 py-0.5 border border-slate-400">00110466000494</span></p>
+            </div>
+            <div class="border-l border-slate-300 pl-4">
+              <p><strong>bKash Official Account:</strong> <span class="font-mono-code font-bold text-pink-700">01715219176</span></p>
+              <p><strong>Nagad Official Account:</strong> <span class="font-mono-code font-bold text-orange-700">01708761298</span></p>
+              <p><strong>Office:</strong> 15 Mayakanon, Basaboo, Khilgaon, Dhaka-1214</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-300 p-3 text-[10.5px] text-slate-700 space-y-1">
+          <div class="font-mono-code text-[10px] font-bold text-[#0F1722] uppercase">04 // BINDING TRANSPARENCY, DATA OWNERSHIP &amp; 30-DAY ROI WARRANTY</div>
+          <p contenteditable="true"><strong>1. 100% Client Data &amp; Escrow Ownership:</strong> All project buyer installments flow directly into the Client's designated bank escrow account. Client retains 100% ownership of all records.</p>
+          <p contenteditable="true"><strong>2. Zero Third-Party API Markup:</strong> Direct Meta WhatsApp conversation fees, SSL Wireless SMS credits, and courier/bank charges are billed at exact actuals with 0% AIS commission.</p>
+          <p contenteditable="true"><strong>3. 30-Day Honest Performance Warranty:</strong> If the deployed Sandbox workflow fails to execute the agreed trigger-action scenarios accurately within 30 days of handover, AIS will rectify the engineering at zero cost.</p>
+        </div>
+      </div>
+
+      <footer class="grid grid-cols-2 gap-8 pt-3 border-t-2 border-[#0F1722] text-xs mt-3">
+        <div>
+          <div class="font-mono-code text-[10px] text-slate-500 uppercase">FOR AIS ENTERPRISE SYSTEMS (ARMY IBA SPECIALIST)</div>
+          <div class="h-8 flex items-end font-syne font-bold text-base italic text-[#0F1722]" contenteditable="true">Rizum Khan</div>
+          <div class="border-t border-slate-400 pt-1 mt-1">
+            <p class="font-bold text-[#0F1722]">Rizum Khan — Founder &amp; Chief Solutions Architect</p>
+            <p class="text-[10px] text-slate-600">15 Mayakanon, Basaboo, Khilgaon, Dhaka-1214</p>
+          </div>
+        </div>
+        <div>
+          <div class="font-mono-code text-[10px] text-slate-500 uppercase">ACCEPTED BY CLIENT ORGANIZATION (SIGNATURE &amp; STAMP)</div>
+          <div class="h-8"></div>
+          <div class="border-t border-slate-400 pt-1 mt-1">
+            <p class="font-bold text-[#0F1722]" contenteditable="true">Authorized Signatory &amp; Official Company Stamp</p>
+            <p class="text-[10px] text-slate-600" contenteditable="true">Payment TrxID / Cheque Ref: ______________________</p>
+          </div>
+        </div>
+      </footer>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- DOCUMENT 4: OFFICIAL NBR MUSHAK-6.3 TAX INVOICE (কর চালানপত্র)       -->
+    <!-- =================================================================== -->
+    <section id="sheet-doc4" class="a4-page hidden flex flex-col justify-between font-bangla">
+      <div>
+        <div class="relative border-b-2 border-black pb-3 mb-3 flex items-center justify-between">
+          <div class="w-14 h-14 rounded-full overflow-hidden border border-black bg-[#0F1722] flex items-center justify-center shrink-0">
+            <img src="ais-logo.jpg" alt="AIS" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <svg class="w-14 h-14 hidden"><use href="#ais-official-logo"></use></svg>
+          </div>
+          <div class="text-center flex-1 px-2">
+            <p class="text-xs font-semibold">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার (Government of the People's Republic of Bangladesh)</p>
+            <p class="text-xs font-bold">জাতীয় রাজস্ব বোর্ড, ঢাকা (National Board of Revenue)</p>
+            <h2 class="text-lg font-extrabold mt-0.5 underline">কর চালানপত্র (TAX INVOICE)</h2>
+            <p class="text-[10px] text-slate-700">[বিধি ৪০ এর উপ-বিধি (১) এর দফা (গ) ও দফা (চ) দ্রষ্টব্য | Prescribed under Rule 40(1) of VAT &amp; SD Rules, 2016]</p>
+          </div>
+          <div class="border-2 border-black px-3 py-1 font-bold text-xs shrink-0 text-center">
+            মূসক-৬.৩<br><span class="font-mono-code text-[10px]">(Mushak-6.3)</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-0 border-2 border-black text-xs mb-4">
+          <div class="p-3 border-r-2 border-black space-y-1">
+            <div class="font-mono-code text-[10px] font-bold uppercase text-slate-600">SUPPLIER / নিবন্ধিত সরবরাহকারীর তথ্য</div>
+            <p><strong>নাম (Name):</strong> <span contenteditable="true">AIS (Army IBA Specialist) Enterprise Systems</span></p>
+            <p><strong>বিআইএন (Supplier BIN):</strong> <span class="font-mono-code font-bold bg-slate-100 px-1 border border-slate-400" contenteditable="true">004982103-0101</span></p>
+            <p><strong>ঠিকানা (Issue Address):</strong> <span contenteditable="true">15 Mayakanon, Basaboo, Khilgaon, Dhaka-1214, Bangladesh</span></p>
+            <p><strong>সেবার কোড (Service Code):</strong> <span class="font-mono-code" contenteditable="true">S099.10 (IT Enabled Services)</span></p>
+          </div>
+
+          <div class="p-3 space-y-1">
+            <div class="font-mono-code text-[10px] font-bold uppercase text-slate-600">PURCHASER / ক্রেতা ও চালান তথ্য</div>
+            <p><strong>ক্রেতার নাম (Buyer):</strong> <span class="font-bold" contenteditable="true">Sheltech (Pvt.) Ltd.</span></p>
+            <p><strong>ক্রেতার বিআইএন (Buyer BIN):</strong> <span class="font-mono-code font-bold bg-slate-100 px-1 border border-slate-400" contenteditable="true">001928374-0101</span></p>
+            <p><strong>ক্রেতার ঠিকানা (Address):</strong> <span contenteditable="true">55 West Panthapath, Dhaka-1205, Bangladesh</span></p>
+            <div class="border-t border-black pt-1 mt-1 grid grid-cols-2 gap-1 font-mono-code text-[11px]">
+              <div><strong>চালান নং:</strong> <span contenteditable="true">2026-2027-DHK-0101</span></div>
+              <div><strong>তারিখ ও সময়:</strong> <span contenteditable="true">17/10/2026 14:30</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Official 11-Column NBR Mushak 6.3 Table -->
+        <table class="w-full border-collapse border-2 border-black text-[11px] mb-4">
+          <thead>
+            <tr class="bg-slate-100 text-center font-bold">
+              <th class="border border-black p-1.5 w-8">(১)<br>ক্রমিক</th>
+              <th class="border border-black p-1.5 text-left">(২)<br>পণ্য বা সেবার বর্ণনা (Description of Service)</th>
+              <th class="border border-black p-1.5 w-12">(৩)<br>একক</th>
+              <th class="border border-black p-1.5 w-10">(৪)<br>পরিমাণ</th>
+              <th class="border border-black p-1.5 w-20">(৫)<br>একক মূল্য</th>
+              <th class="border border-black p-1.5 w-20">(৬)<br>মোট মূল্য</th>
+              <th class="border border-black p-1.5 w-10">(৭)<br>SD%</th>
+              <th class="border border-black p-1.5 w-12">(৮)<br>SD টাকা</th>
+              <th class="border border-black p-1.5 w-12">(৯)<br>মূসক%</th>
+              <th class="border border-black p-1.5 w-20">(১০)<br>মূসক পরিমাণ</th>
+              <th class="border border-black p-1.5 w-24">(১১)<br>সর্বমোট মূল্য</th>
+            </tr>
+          </thead>
+          <tbody class="font-mono-code">
+            <tr>
+              <td class="border border-black p-2 text-center">01</td>
+              <td class="border border-black p-2 font-sans" contenteditable="true">
+                <strong>AIS Single-Asset Sandbox Setup (50% Mobilization Token)</strong><br>
+                <span class="text-[10px] text-slate-600">Service Code: S099.10 (Custom Workflow &amp; Escrow Setup)</span>
+              </td>
+              <td class="border border-black p-2 text-center">Job</td>
+              <td class="border border-black p-2 text-center" contenteditable="true">1</td>
+              <td class="border border-black p-2 text-right" contenteditable="true">75,000.00</td>
+              <td class="border border-black p-2 text-right" contenteditable="true">75,000.00</td>
+              <td class="border border-black p-2 text-center">0%</td>
+              <td class="border border-black p-2 text-right">0.00</td>
+              <td class="border border-black p-2 text-center" contenteditable="true">5.0%</td>
+              <td class="border border-black p-2 text-right" contenteditable="true">3,750.00</td>
+              <td class="border border-black p-2 text-right font-bold" contenteditable="true">78,750.00</td>
+            </tr>
+            <tr>
+              <td class="border border-black p-2 text-center">02</td>
+              <td class="border border-black p-2 font-sans" contenteditable="true">
+                <strong>Phase IV Digital Escrow ERP &amp; NRB Portal (Month 1)</strong><br>
+                <span class="text-[10px] text-slate-600">Service Code: S099.10 (Hosted Software &amp; Queue Retainer)</span>
+              </td>
+              <td class="border border-black p-2 text-center">Month</td>
+              <td class="border border-black p-2 text-center" contenteditable="true">1</td>
+              <td class="border border-black p-2 text-right" contenteditable="true">35,000.00</td>
+              <td class="border border-black p-2 text-right" contenteditable="true">35,000.00</td>
+              <td class="border border-black p-2 text-center">0%</td>
+              <td class="border border-black p-2 text-right">0.00</td>
+              <td class="border border-black p-2 text-center" contenteditable="true">5.0%</td>
+              <td class="border border-black p-2 text-right" contenteditable="true">1,750.00</td>
+              <td class="border border-black p-2 text-right font-bold" contenteditable="true">36,750.00</td>
+            </tr>
+            <tr class="bg-slate-100 font-bold">
+              <td colspan="5" class="border border-black p-2 text-right font-sans">সর্বমোট (Grand Total in BDT):</td>
+              <td class="border border-black p-2 text-right" contenteditable="true">1,10,000.00</td>
+              <td class="border border-black p-2 text-center">—</td>
+              <td class="border border-black p-2 text-right">0.00</td>
+              <td class="border border-black p-2 text-center">—</td>
+              <td class="border border-black p-2 text-right" contenteditable="true">5,500.00</td>
+              <td class="border border-black p-2 text-right text-sm" contenteditable="true">৳1,15,500.00</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="border border-black p-2.5 text-xs mb-4">
+          <strong>কথায় (Amount in Words):</strong> <span class="italic font-semibold" contenteditable="true">One Lakh Fifteen Thousand Five Hundred Taka Only (Including 5% ITES VAT).</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 border-2 border-black p-3 text-xs bg-slate-50 mb-3">
+          <div>
+            <div class="font-mono-code text-[10px] font-bold uppercase text-[#0F1722] mb-1">ব্যাংক হিসাবের তথ্য (BANK RTGS / BEFTN SETTLEMENT)</div>
+            <p><strong>Bank Name:</strong> Trust Bank PLC</p>
+            <p><strong>Branch:</strong> Jalalabad Cantonment Branch</p>
+            <p><strong>Account Name:</strong> AIS Enterprise Systems</p>
+            <p class="font-mono-code font-bold"><strong>Account No:</strong> 00110466000494</p>
+          </div>
+          <div class="border-l border-black pl-4">
+            <div class="font-mono-code text-[10px] font-bold uppercase text-[#0F1722] mb-1">মোবাইল ব্যাংকিং (bKASH / NAGAD MERCHANT)</div>
+            <p class="font-mono-code"><strong>bKash Official Number:</strong> 01715219176</p>
+            <p class="font-mono-code"><strong>Nagad Official Number:</strong> 01708761298</p>
+            <p class="font-mono-code text-[11px] mt-1"><strong>Reference:</strong> 2026-2027-DHK-0101</p>
+            <p class="text-[10px] text-slate-700 mt-0.5">Head Office: 15 Mayakanon, Basaboo, Khilgaon, Dhaka-1214</p>
+          </div>
+        </div>
+      </div>
+
+      <footer class="pt-3 border-t-2 border-black text-xs">
+        <div class="grid grid-cols-2 gap-8 items-end">
+          <div class="text-[10px] space-y-1 text-slate-800">
+            <p><strong>* ১।</strong> উৎসে কর কর্তনযোগ্য সরবরাহের ক্ষেত্রে ফরমটি সমন্বিত কর চালানপত্র ও উৎসে কর কর্তন সনদপত্র হিসেবে বিবেচিত হইবে এবং উহা উৎসে কর কর্তনযোগ্য প্রযোজ্য হবে। (Valid as combined Tax Invoice and VDS Certificate under VAT &amp; SD Act, 2012).</p>
+            <p><strong>* ২।</strong> অর্থ আইন ২০২৬ (Finance Act 2026) অনুযায়ী ইআরপি (ERP) সিস্টেম হতে স্বয়ংক্রিয়ভাবে ইস্যুকৃত ও ৫ বছর সংরক্ষিত ডিজিটাল মূসক-৬.৩ চালান।</p>
+            <p class="font-mono-code text-[9px] text-slate-600">ERP SHA-256 Verification: AIS-BD-2026-M63-9940218A</p>
+          </div>
+          <div class="text-right">
+            <p class="text-[11px] mb-5">দায়িত্বপ্রাপ্ত ব্যক্তির স্বাক্ষর ও সীল:</p>
+            <div class="inline-block text-left border-t border-black pt-1 min-w-[220px]">
+              <p class="font-bold" contenteditable="true">নাম (Name): Rizum Khan</p>
+              <p contenteditable="true">পদবী: Founder, AIS (Army IBA Specialist)</p>
+              <p class="text-[10px] text-slate-600">15 Mayakanon, Basaboo, Khilgaon, Dhaka-1214</p>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- DOCUMENT VAULT CONTROLLER SCRIPT                                      -->
+  <!-- ===================================================================== -->
+  <script>
+    let currentDoc = 'doc1';
+
+    const docNames = {
+      doc1: 'AIS_Doc1_Master_Operating_Manual.pdf',
+      doc2: 'AIS_Doc2_Tier1_Real_Estate_Dossier.pdf',
+      doc3: 'AIS_Doc3_Client_Proposal_And_MSA.pdf',
+      doc4: 'AIS_Doc4_Official_NBR_Mushak63_Invoice.pdf',
+      all:  'AIS_Complete_4_Document_Corporate_Pack.pdf'
+    };
+
+    function showDoc(docId) {
+      currentDoc = docId;
+      const docs = ['doc1', 'doc2', 'doc3', 'doc4'];
+
+      docs.forEach(d => {
+        const sheet = document.getElementById(`sheet-${d}`);
+        const tab = document.getElementById(`tab-${d}`);
+        if (docId === 'all' || docId === d) {
+          sheet.classList.remove('hidden');
+        } else {
+          sheet.classList.add('hidden');
+        }
+
+        if (docId === d) {
+          tab.className = 'px-3 py-1.5 font-mono-code text-[11px] font-bold uppercase bg-[#38BDF8] text-[#080C12] transition';
+        } else {
+          tab.className = 'px-3 py-1.5 font-mono-code text-[11px] font-bold uppercase bg-slate-900 text-slate-300 border border-slate-700 hover:border-[#38BDF8] transition';
+        }
+      });
+
+      const allBtn = document.getElementById('tab-all');
+      allBtn.className = docId === 'all'
+        ? 'px-3 py-1.5 font-mono-code text-[11px] font-bold uppercase bg-amber-400 text-[#080C12] transition ml-auto'
+        : 'px-3 py-1.5 font-mono-code text-[11px] font-bold uppercase bg-slate-800 text-amber-300 border border-amber-500/40 hover:bg-slate-700 transition ml-auto';
+    }
+
+    function downloadActivePDF() {
+      const btn = document.getElementById('btn-dl-pdf');
+      const orig = btn.innerText;
+      btn.innerText = '⏳ Exporting PDF...';
+
+      const target = currentDoc === 'all'
+        ? document.getElementById('vault-export-container')
+        : document.getElementById(`sheet-${currentDoc}`);
+
+      const opt = {
+        margin: 0,
+        filename: docNames[currentDoc] || 'AIS_Corporate_Document.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(target).save().then(() => {
+        btn.innerText = orig;
+      });
+    }
+  </script>
+</body>
+</html>

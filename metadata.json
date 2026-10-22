@@ -1,0 +1,6 @@
+{
+  "name": "AIS Enterprise Systems — Obsidian Cockpit v4.2",
+  "description": "AIS x GEMINI 4 ARGON Capital Relief Cockpit & White-Labeled Client Onboarding Infrastructure.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
