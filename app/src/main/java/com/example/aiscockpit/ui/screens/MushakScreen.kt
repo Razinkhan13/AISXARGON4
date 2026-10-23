@@ -3,6 +3,7 @@ package com.example.aiscockpit.ui.screens
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -238,9 +239,9 @@ fun MushakInvoiceCard(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     TextButton(onClick = onCopy) {
-                        Icon(imageVector = Icons.Default.ContentCopy, contentDescription = "Copy", modifier = Modifier.size(14.dp), tint = Color.Black)
+                        Icon(imageVector = Icons.Default.Share, contentDescription = "Share", modifier = Modifier.size(14.dp), tint = Color.Black)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Copy", color = Color.Black, fontSize = 11.sp)
+                        Text("Share Invoice", color = Color.Black, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }
 
                     if (invoice.status != MushakStatus.SETTLED) {
@@ -265,7 +266,7 @@ fun AddMushakDialog(
     onAdd: (String, String, String, Long) -> Unit
 ) {
     var client by remember { mutableStateOf("") }
-    var bin by remember { mutableStateOf("000") }
+    var bin by remember { mutableStateOf("000184920-0101") }
     var service by remember { mutableStateOf("Tier-2 Single-Asset Relief Sandbox (50% Retainer)") }
     var baseAmtText by remember { mutableStateOf("600000") }
 
@@ -323,18 +324,44 @@ fun AddMushakDialog(
 }
 
 fun copyMushak(context: Context, invoice: MushakInvoice) {
+    val aitWithholding = (invoice.baseAmountBDT * 0.10).toLong()
+    val netWireReceivable = invoice.baseAmountBDT + invoice.vatAmountBDT - aitWithholding
+
     val text = """
-        *FORM MUSHAK-6.3 (VAT TAX INVOICE)*
-        Serial No: ${invoice.serialNo}
+        *GOVERNMENT OF THE PEOPLE'S REPUBLIC OF BANGLADESH*
+        *NATIONAL BOARD OF REVENUE • FORM MUSHAK-6.3*
+        [Rule 40(1) Tax Invoice under VAT Act 2012]
+        
+        Serial Number: ${invoice.serialNo}
         Date: ${invoice.issuedDate}
-        Client: ${invoice.clientName} (BIN: ${invoice.clientBin})
-        Supplier: AIS Enterprise Systems (BIN: 004928190-0101)
-        Service: ${invoice.serviceDescription}
-        Base Value: ৳${formatNumber(invoice.baseAmountBDT)}
-        VAT (5%): ৳${formatNumber(invoice.vatAmountBDT)}
-        *Net Total: ৳${formatNumber(invoice.totalAmountBDT)}*
+        Issuer: AIS Enterprise Systems Ltd. (BIN: 004928190-0101)
+        Recipient: ${invoice.clientName} (BIN: ${invoice.clientBin})
+        Service Category: ${invoice.serviceDescription}
+        
+        Base Retainer Value: ৳${formatNumber(invoice.baseAmountBDT)}
+        Statutory VAT (+5%): ৳${formatNumber(invoice.vatAmountBDT)}
+        Statutory AIT Section 52 (-10% Withholding): ৳${formatNumber(aitWithholding)}
+        *Net Statutory Wire Due: ৳${formatNumber(netWireReceivable)}*
+        
         Status: ${invoice.status.name}
+        Legal Note: Mushak-6.6 Withholding Certificate must be issued upon wire clearance.
     """.trimIndent()
+
     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     clipboard.setPrimaryClip(ClipData.newPlainText("Mushak-6.3", text))
+
+    val sendIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_SUBJECT, "Form Mushak-6.3 (${invoice.serialNo})")
+        putExtra(Intent.EXTRA_TEXT, text)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    try {
+        context.startActivity(Intent.createChooser(sendIntent, "Share Mushak-6.3").apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        })
+    } catch (_: Exception) {
+        // Fallback: clipboard is already set
+    }
 }
