@@ -1,15 +1,19 @@
 {
-  "id": "/",
+  "id": "com.ais.capitalcockpit",
   "name": "AIS Capital Relief Cockpit",
   "short_name": "AIS Cockpit",
   "description": "Enterprise Systems & Capital Relief Cockpit for Bangladeshi Real Estate & E-Commerce.",
-  "start_url": "/",
+  "start_url": "/?source=pwa_android",
   "scope": "/",
   "display": "standalone",
-  "orientation": "any",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
   "background_color": "#04070e",
   "theme_color": "#04070e",
   "categories": ["business", "finance", "productivity"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/pwa-192x192.png",
@@ -34,6 +38,36 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "৳1 Crore Pipeline",
+      "short_name": "Pipeline",
+      "description": "View locked deals & 90-day trajectory",
+      "url": "/#tab-lock",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "38s WhatsApp Concierge",
+      "short_name": "38s Demo",
+      "description": "Interactive WhatsApp sales simulation",
+      "url": "/#tab-sandbox",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Boardroom Pitch Deck",
+      "short_name": "Pitch Deck",
+      "description": "Launch 4-slide closer presentation",
+      "url": "/#pitch",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mushak-6.3 VAT Tax",
+      "short_name": "Invoice",
+      "description": "Generate statutory VAT invoice",
+      "url": "/#tab-mushak",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
     }
   ]
 }

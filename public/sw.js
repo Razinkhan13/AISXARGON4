@@ -1,7 +1,7 @@
 /**
  * AIS Capital Relief Cockpit - Service Worker (PWA Mobile Offline Engine)
  */
-const CACHE_NAME = 'ais-cockpit-pwa-v1';
+const CACHE_NAME = 'ais-cockpit-android-v2';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
@@ -14,7 +14,8 @@ const PRECACHE_ASSETS = [
   '/tailwind.bundle.js',
   '/qrcode.bundle.js',
   '/jsqr.bundle.js',
-  '/html2pdf.bundle.js'
+  '/html2pdf.bundle.js',
+  '/supabase.bundle.js'
 ];
 
 self.addEventListener('install', (event) => {
