@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">AIS Enterprise Systems — Obsidian Cockpit v4.2</string>
+    <string name="app_short_name">AIS Cockpit</string>
+    <string name="nav_outreach">Outreach</string>
+    <string name="nav_audit">Audit</string>
+    <string name="nav_revenue">Revenue</string>
+    <string name="nav_mushak">Mushak-6.3</string>
+    <string name="nav_sandbox">Sandbox</string>
+    <string name="nav_vault">Vault</string>
+    <string name="nav_gateway">Gateway</string>
+</resources>

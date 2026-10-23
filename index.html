@@ -415,7 +415,9 @@
     <!-- Top Presentation Control Bar -->
     <div class="bg-[#070b14] border-b border-slate-800 px-4 sm:px-8 py-3.5 flex items-center justify-between shrink-0">
       <div class="flex items-center gap-3">
-        <img src="/ais-logo.svg" alt="AIS Brand Logo" class="w-9 h-9 rounded-full border border-amber-400/60 object-cover shadow-[0_0_12px_rgba(251,191,36,0.4)]" onerror="this.src='/ais-logo.png'" />
+        <div class="w-8 h-8 rounded-lg bg-amber-400 text-slate-950 font-black flex items-center justify-center text-sm shadow">
+          AIS
+        </div>
         <div>
           <div class="flex items-center gap-2">
             <span class="text-[10px] font-mono-code uppercase bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full font-bold">
@@ -952,7 +954,7 @@
           <canvas id="modalQrCanvas" width="220" height="220" class="rounded-xl mx-auto block"></canvas>
           <div id="modalQrLogoOverlay" class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="w-12 h-12 rounded-full p-0.5 bg-[#0e0e0e] border-2 border-[#ffb1c3] shadow-lg flex items-center justify-center overflow-hidden">
-              <img src="/ais-logo.svg" alt="AIS" class="w-full h-full object-cover rounded-full" />
+              <img src="/ais-logo.jpg" alt="AIS" class="w-full h-full object-cover rounded-full" />
             </div>
           </div>
         </div>
@@ -1069,7 +1071,7 @@
     <div id="adminHeaderMainBar" class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3.5">
         <div class="relative w-12 h-12 rounded-full p-0.5 bg-gradient-to-br from-sky-400 to-emerald-400 shadow-[0_0_15px_rgba(56,189,248,0.35)] shrink-0">
-          <img src="/ais-logo.svg" alt="AIS Logo" class="w-full h-full rounded-full object-cover" onerror="this.src='/ais-logo.png'" />
+          <img src="/ais-logo.jpg" alt="AIS Logo" class="w-full h-full rounded-full object-cover" onerror="this.src='/ais-logo.png'" />
         </div>
         <div>
           <div class="flex items-center gap-2">
@@ -1808,7 +1810,7 @@
                   <canvas id="reProjectQrCanvas" width="220" height="220" class="rounded-xl mx-auto block"></canvas>
                   <div id="qrCenterLogoOverlay" class="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div class="w-12 h-12 rounded-full p-0.5 bg-[#04070e] border-2 border-[#00dbe9] shadow-lg flex items-center justify-center overflow-hidden">
-                      <img src="/ais-logo.svg" alt="AIS" class="w-full h-full object-cover rounded-full" onerror="this.src='/ais-logo.png'" />
+                      <img src="/ais-logo.jpg" alt="AIS" class="w-full h-full object-cover rounded-full" onerror="this.src='/ais-logo.png'" />
                     </div>
                   </div>
                 </div>
@@ -8198,7 +8200,7 @@ ${demoUrl}
   <div id="reProjectQrPrintSheet" class="hidden print:block p-8 bg-white text-slate-950 font-sans max-w-[210mm] mx-auto border-4 border-slate-900">
     <div class="flex items-center justify-between border-b-2 border-slate-900 pb-4">
       <div class="flex items-center gap-3">
-        <img src="/ais-logo.svg" alt="AIS Logo" class="w-14 h-14 rounded-full border-2 border-slate-900 object-cover" />
+        <img src="/ais-logo.jpg" alt="AIS Logo" class="w-14 h-14 rounded-full border-2 border-slate-900 object-cover" />
         <div>
           <span class="text-[10px] font-mono-code font-bold uppercase tracking-widest px-2 py-0.5 bg-slate-900 text-white rounded">OFFICIAL VERIFIED SITE QR CODE</span>
           <h2 id="printSignboardDev" class="text-xl font-bold font-sans mt-0.5">Sheltech (Pvt.) Ltd.</h2>
